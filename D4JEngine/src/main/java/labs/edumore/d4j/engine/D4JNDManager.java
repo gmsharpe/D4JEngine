@@ -4,6 +4,7 @@ package labs.edumore.d4j.engine;
 import java.lang.ref.Reference;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ai.djl.Device;
+import ai.djl.engine.Engine;
+import ai.djl.ndarray.BaseNDManager;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDList;
 import ai.djl.ndarray.NDManager;
@@ -20,11 +23,10 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.util.PairList;
 
-
-public class D4JNDManager implements NDManager {
+public class D4JNDManager extends BaseNDManager {
 
     private static final Logger logger = LoggerFactory.getLogger(D4JNDManager.class);
-    
+
     /**
      * A global {@link NDManager} singleton instance.
      *
@@ -35,53 +37,55 @@ public class D4JNDManager implements NDManager {
      */
     private static final D4JNDManager SYSTEM_MANAGER = new SystemManager();
 
-    private static final NDArray[] EMPTY = new NDArray[0];
-
-    private NDManager parent;
-    private String uid;
-    private Device device;
-    private Map<String, Reference<AutoCloseable>> resources;
-    private AtomicBoolean closed = new AtomicBoolean(false);
-
     private D4JNDManager(NDManager parent, Device device) {
 
-        this.parent = parent;
-        this.device = Device.defaultIfNull(device);
-        resources = new ConcurrentHashMap<>();
-        uid = UUID.randomUUID().toString();
+        super(parent,device);
     }
-    
+
     public static D4JNDManager getSystemManager() {
+
         return SYSTEM_MANAGER;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public ByteBuffer allocateDirect(int capacity) {
 
-        return null;
+        return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
+    /** {@inheritDoc} */
+    @Override
     public NDArray create(Shape shape, DataType dataType, Device device) {
 
         return null;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public NDArray
         createCSR(Buffer data, long[] indptr, long[] indices, Shape shape, Device device) {
 
         return null;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public NDArray
         createRowSparse(Buffer data, Shape dataShape, long[] indices, Shape shape, Device device) {
 
         return null;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
 
         return null;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public NDArray ones(Shape shape, DataType dataType, Device device) {
 
         return null;
@@ -132,12 +136,14 @@ public class D4JNDManager implements NDManager {
 
     public D4JNDManager newSubManager() {
 
-        return null;
+        return newSubManager(device);
     }
 
     public D4JNDManager newSubManager(Device device) {
 
-        return null;
+        D4JNDManager manager = new D4JNDManager(this, device);
+        attach(manager.uid,manager);
+        return manager;
     }
 
     public Device getDevice() {
@@ -156,29 +162,14 @@ public class D4JNDManager implements NDManager {
     public void
         invoke(String operation, NDArray[] src, NDArray[] dest, PairList<String, ?> params) {
 
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     public NDList invoke(String operation, NDList src, PairList<String, ?> params) {
 
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
-    public void close() {
-        if (!closed.getAndSet(true)) {
-            for (Reference<AutoCloseable> resource : resources.values()) {
-                AutoCloseable closeable = resource.get();
-                if (closeable != null) {
-                    try {
-                        closeable.close();
-                    } catch (Exception e) {
-                        logger.error("Resource close failed.", e);
-                    }
-                }
-            }
-            parent.detach(uid);
-            resources.clear();
-        }
-    }
 
     /** The SystemManager is the root {@link MxNDManager} of which all others are children. */
     private static final class SystemManager extends D4JNDManager {
@@ -201,6 +192,17 @@ public class D4JNDManager implements NDManager {
         public void close() {}
     }
 
+    @Override
+    public boolean isOpen() {
 
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Engine getEngine() {
+
+        return Engine.getEngine(D4JEngine.ENGINE_NAME);
+    }
 
 }

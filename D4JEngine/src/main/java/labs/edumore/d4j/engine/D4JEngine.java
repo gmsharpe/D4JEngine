@@ -1,13 +1,11 @@
 package labs.edumore.d4j.engine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ai.djl.Device;
 import ai.djl.Model;
 import ai.djl.engine.Engine;
 import ai.djl.ndarray.NDManager;
-
-import java.lang.management.MemoryUsage;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * Copyright 2020 Gary Sharpe
@@ -27,14 +25,13 @@ import org.slf4j.LoggerFactory;
  * To get an instance of the {@code D4JEngine} when it is not the default Engine, call
  * {@link Engine#getEngine(String)} with the Engine name "D4J".
  */
-
 public class D4JEngine extends Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(D4JEngine.class);
 
     public static final String ENGINE_NAME = "D4J";
 
-    /** Constructs an D4J Engine. */
+    /** Constructs a D4J Engine. */
     D4JEngine() {
 
     }
@@ -50,12 +47,7 @@ public class D4JEngine extends Engine {
     @Override
     public String getVersion() {
 
-        int version = 0; // TODO
-        int major = version / 10000;
-        int minor = version / 100 - major * 100;
-        int patch = version % 100;
-
-        return major + "." + minor + '.' + patch;
+        return "0.0.1";
     }
 
     /** {@inheritDoc} */
@@ -69,14 +61,14 @@ public class D4JEngine extends Engine {
     @Override
     public NDManager newBaseManager() {
 
-        return null;
+        return D4JNDManager.getSystemManager().newSubManager();
     }
 
     /** {@inheritDoc} */
     @Override
     public NDManager newBaseManager(Device device) {
 
-        return null;
+        return D4JNDManager.getSystemManager().newSubManager(device);
     }
 
     /** {@inheritDoc} */
@@ -89,34 +81,17 @@ public class D4JEngine extends Engine {
           .append(", version: ")
           .append(getVersion())
           .append(", capabilities: [\n");
-        // TODO
-        /*
-         * for (String feature : JnaUtils.getFeatures()) {
-         * sb.append("\t").append(feature).append(",\n"); // NOPMD }
-         */
-        sb.append(']');
+
         return sb.toString();
     }
 
-    @Override
-    public int getGpuCount() {
 
-        // TODO Auto-generated method stub
-        return 0;
+    @Override
+    public boolean hasCapability(String capability) {
+        return false;
     }
 
     @Override
-    public MemoryUsage getGpuMemory(Device device) {
-
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Device defaultDevice() {
-
-        // TODO Auto-generated method stub
-        return null;
-    }
+    public void setRandomSeed(int seed) {}
 
 }
