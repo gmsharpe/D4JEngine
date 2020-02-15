@@ -2,7 +2,12 @@ package labs.edumore.d4j.engine;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
@@ -14,23 +19,69 @@ import ai.djl.ndarray.types.DataType;
 import ai.djl.ndarray.types.Shape;
 import ai.djl.ndarray.types.SparseFormat;
 
-public class D4JNDarray implements NDArray {
+public class D4JNDArray implements NDArray, AutoCloseable {
+
+    private static final Logger logger = LoggerFactory.getLogger(D4JNDArray.class);
+
+    private String name;
+    private Device device;
+    private DataType dataType;
+    private Shape shape;
+    private SparseFormat sparseFormat;
+    private D4JNDManager manager;
+
+    private Exception exception;
+
+    private INDArray iNDArray;
+
+    protected final AtomicReference<INDArray> handle;
+
+    public D4JNDArray(D4JNDManager systemManager, INDArray iNDArray, Shape shape, Device device) {
+
+        this.handle = new AtomicReference<INDArray>(iNDArray);
+        this.iNDArray = iNDArray;
+        this.manager = systemManager;
+        this.device = device;
+        this.shape = shape;
+        if (logger.isTraceEnabled()) {
+            exception = new Exception();
+        }
+    }
+
+    public D4JNDArray(D4JNDManager systemManager, INDArray iNDArray, Device device) {
+
+        this.handle = new AtomicReference<INDArray>(iNDArray);
+        this.iNDArray = iNDArray;
+        this.manager = systemManager;
+        this.device = device;
+        this.shape = extractShape(iNDArray);
+        if (logger.isTraceEnabled()) {
+            exception = new Exception();
+        }
+    }
+
+    public static Shape extractShape(INDArray iNDArray) {
+
+        return new Shape(iNDArray.shape());
+
+    }
 
     @Override
     public NDManager getManager() {
 
-        return null;
+        return manager;
     }
 
     @Override
     public String getName() {
 
-        return null;
+        return name;
     }
 
     @Override
     public void setName(String name) {
 
+        this.name = name;
     }
 
     @Override
@@ -42,19 +93,19 @@ public class D4JNDarray implements NDArray {
     @Override
     public DataType getDataType() {
 
-        return null;
+        return dataType;
     }
 
     @Override
     public Device getDevice() {
 
-        return null;
+        return device;
     }
 
     @Override
     public Shape getShape() {
 
-        return null;
+        return shape;
     }
 
     @Override
@@ -74,7 +125,6 @@ public class D4JNDarray implements NDArray {
 
         return null;
     }
-
 
     @Override
     public void attachGradient() {
@@ -96,21 +146,25 @@ public class D4JNDarray implements NDArray {
     @Override
     public void set(Buffer data) {
 
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public void set(NDIndex index, NDArray value) {
 
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public void set(NDIndex index, Number value) {
 
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public void setScalar(NDIndex index, Number value) {
 
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -157,25 +211,26 @@ public class D4JNDarray implements NDArray {
     @Override
     public NDArray eq(Number other) {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.eq(other), device);
     }
 
     @Override
     public NDArray eq(NDArray other) {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.eq(((D4JNDArray) other).iNDArray), device);
     }
 
     @Override
     public NDArray neq(Number other) {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.neq(other), device);
     }
 
     @Override
     public NDArray neq(NDArray other) {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.neq(((D4JNDArray) other).iNDArray), device);
+
     }
 
     @Override
@@ -622,8 +677,6 @@ public class D4JNDarray implements NDArray {
         return null;
     }
 
-
-
     @Override
     public NDArray flatten() {
 
@@ -891,6 +944,12 @@ public class D4JNDarray implements NDArray {
     @Override
     public void close() {
 
+        if (handle.get() != null) {
+            handle.get().close();
+            handle.getAndSet(null);
+            manager.detach(getUid());
+            manager = null;
+        }
     }
 
     @Override
@@ -903,8 +962,47 @@ public class D4JNDarray implements NDArray {
     @Override
     public NDArray reshapeLike(NDArray array) {
 
-        // TODO Auto-generated method stub
         return null;
+    }
+
+    /*
+     * 'AtomicReference', 'AutoCloseable' & below inspired by ai.djl.pytorch.jni.NativeResource
+     */
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+
+        logger.warn("Resource ({}) was not closed explicitly: {}",
+                    getUid(),
+                    getClass().getSimpleName());
+
+        close();
+        super.finalize();
+    }
+
+    /**
+     * Gets the boolean that indicates whether this resource has been released.
+     *
+     * @return whether this resource has been released
+     */
+    public boolean isReleased() {
+
+        return handle.get() == null;
+    }
+
+    /**
+     * Gets the {@link Pointer} to this resource.
+     *
+     * @return the {@link Pointer} to this resource
+     */
+    protected AtomicReference<INDArray> getHandle() {
+
+        if (handle.get() == null) {
+            throw new IllegalStateException("Native resource has been release already.");
+        }
+        return handle;
     }
 
 }
