@@ -236,25 +236,27 @@ public class D4JNDArray implements NDArray, AutoCloseable {
     @Override
     public NDArray gt(Number other) {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.gt(other), device);
+
     }
 
     @Override
     public NDArray gt(NDArray other) {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.gt(((D4JNDArray) other).iNDArray), device);
+
     }
 
     @Override
     public NDArray gte(Number other) {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.gte(other), device);
     }
 
     @Override
     public NDArray gte(NDArray other) {
 
-        return null;
+      return null;
     }
 
     @Override
