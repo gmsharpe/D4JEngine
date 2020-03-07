@@ -6,8 +6,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.jna.Pointer;
 
 import ai.djl.Device;
 import ai.djl.ndarray.NDArray;
@@ -34,6 +37,10 @@ public class D4JNDArray implements NDArray, AutoCloseable {
 
     private INDArray iNDArray;
 
+    public INDArray iNDArray() {
+        return iNDArray;
+    }
+    
     protected final AtomicReference<INDArray> handle;
 
     public D4JNDArray(D4JNDManager systemManager, INDArray iNDArray, Shape shape, Device device) {
@@ -169,7 +176,11 @@ public class D4JNDArray implements NDArray, AutoCloseable {
 
     @Override
     public NDArray get(NDIndex index) {
-
+        
+        // TODO convert NDIndex to INDArrayIndex
+        index.getIndices();
+        INDArrayIndex idx;
+      //  return  new D4JNDArray(manager,iNDArray.get(idx),device);
         return null;
     }
 
@@ -664,7 +675,7 @@ public class D4JNDArray implements NDArray, AutoCloseable {
     @Override
     public NDArray mean() {
 
-        return null;
+        return new D4JNDArray(manager, iNDArray.mean(0), device);
     }
 
     @Override
@@ -1007,4 +1018,10 @@ public class D4JNDArray implements NDArray, AutoCloseable {
         return handle;
     }
 
+    
+    @Override
+    public String toString() {
+        return iNDArray.toString();
+    }
+    
 }

@@ -9,6 +9,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
+import org.bytedeco.javacpp.Loader;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,12 @@ public class D4JNDManager extends BaseNDManager {
     private static final D4JNDManager SYSTEM_MANAGER = new SystemManager();
 
     private D4JNDManager(NDManager parent, Device device) {
-
+        
         super(parent, device);
+        
+        // initializes underlying context.  Loads the backend (cpu/gpu)
+        Nd4j nd4j = new Nd4j();
+        
     }
 
     public static D4JNDManager getSystemManager() {
