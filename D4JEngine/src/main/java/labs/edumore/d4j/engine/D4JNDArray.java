@@ -756,17 +756,7 @@ public class D4JNDArray implements NDArray, AutoCloseable {
         return null;
     }
 
-    @Override
-    public NDArray softmax(int[] axes, double temperature) {
 
-        return null;
-    }
-
-    @Override
-    public NDArray logSoftmax(int[] axes, double temperature) {
-
-        return null;
-    }
 
     @Override
     public NDArray cumSum() {
@@ -882,6 +872,21 @@ public class D4JNDArray implements NDArray, AutoCloseable {
         return null;
     }
 
+    
+    @Override
+    public NDArray logSoftmax(int[] arg0, float arg1) {
+
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public NDArray softmax(int[] arg0, float arg1) {
+
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
     @Override
     public NDArray argMax() {
 
@@ -1023,5 +1028,7 @@ public class D4JNDArray implements NDArray, AutoCloseable {
     public String toString() {
         return iNDArray.toString();
     }
+
+
     
 }

@@ -1,9 +1,9 @@
 package labs.edumore.d4j.examples;
 
 import java.util.List;
+import java.util.Set;
 
 import ai.djl.repository.zoo.ModelLoader;
-import ai.djl.repository.zoo.ModelNotFoundException;
 
 
 public class D4JModelZoo implements ai.djl.repository.zoo.ModelZoo {
@@ -17,8 +17,10 @@ public class D4JModelZoo implements ai.djl.repository.zoo.ModelZoo {
         return null;
     }
 
+
+
     @Override
-    public <I, O> ModelLoader<I, O> getModelLoader(String name) throws ModelNotFoundException {
+    public Set<String> getSupportedEngines() {
 
         // TODO Auto-generated method stub
         return null;
