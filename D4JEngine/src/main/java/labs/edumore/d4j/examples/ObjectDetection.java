@@ -11,12 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
 
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.repository.zoo.ModelZoo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ai.djl.ModelException;
 import ai.djl.inference.Predictor;
-import ai.djl.modality.cv.DetectedObjects;
+
 import ai.djl.modality.cv.ImageVisualization;
 import ai.djl.modality.cv.util.BufferedImageUtils;
 import ai.djl.repository.zoo.ZooModel;
@@ -26,23 +28,22 @@ import ai.djl.translate.TranslateException;
 /**
  * based on this <original example<a
  * href="https://github.com/awslabs/djl/blob/master/examples/docs/object_detection.md">doc</a>
- * 
- * 
- * @author gmsharpe
  *
+ * @author gmsharpe
  */
 
 public class ObjectDetection {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectDetection.class);
 
-    private ObjectDetection() {}
+    private ObjectDetection() {
+    }
 
     public static void main(String[] args) throws IOException, ModelException, TranslateException {
         DetectedObjects detection = ObjectDetection.predict();
         logger.info("{}", detection);
     }
-    
+
     public static DetectedObjects predict() throws IOException, ModelException, TranslateException {
         Path imageFile = Paths.get("src/test/resources/dog_bike_car.jpg");
         BufferedImage img = BufferedImageUtils.fromFile(imageFile);
@@ -53,14 +54,15 @@ public class ObjectDetection {
         criteria.put("flavor", "v1");
         criteria.put("dataset", "voc");
 
-        /*
-         * try (ZooModel<BufferedImage, DetectedObjects> model = D4JModelZoo.SSD.loadModel(criteria,
-         * new ProgressBar())) {
-         * 
-         * try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
-         * DetectedObjects detection = predictor.predict(img); saveBoundingBoxImage(img, detection);
-         * return detection; } }
-         */
+        try (ZooModel<BufferedImage, DetectedObjects> model = D4JModelZoo.D4J.loadModel(criteria,
+                new ProgressBar())) {
+
+            try (Predictor<BufferedImage, DetectedObjects> predictor = model.newPredictor()) {
+                DetectedObjects detection = predictor.predict(img);
+                saveBoundingBoxImage(img, detection);
+                return detection;
+            }
+        }
         return null;
     }
 

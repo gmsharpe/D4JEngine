@@ -11,12 +11,21 @@ public class D4JModelZoo implements ai.djl.repository.zoo.ModelZoo {
     public static final String NAME = "D4J";
 
     @Override
+    public String getGroupId() {
+        return null;
+    }
+
+    @Override
     public List<ModelLoader<?, ?>> getModelLoaders() {
 
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
+    public ModelLoader<?, ?> getModelLoader(String name) {
+        return null;
+    }
 
 
     @Override

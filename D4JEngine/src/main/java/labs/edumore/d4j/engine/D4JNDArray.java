@@ -40,7 +40,7 @@ public class D4JNDArray implements NDArray, AutoCloseable {
     public INDArray iNDArray() {
         return iNDArray;
     }
-    
+
     protected final AtomicReference<INDArray> handle;
 
     public D4JNDArray(D4JNDManager systemManager, INDArray iNDArray, Shape shape, Device device) {
@@ -176,11 +176,11 @@ public class D4JNDArray implements NDArray, AutoCloseable {
 
     @Override
     public NDArray get(NDIndex index) {
-        
+
         // TODO convert NDIndex to INDArrayIndex
         index.getIndices();
         INDArrayIndex idx;
-      //  return  new D4JNDArray(manager,iNDArray.get(idx),device);
+        //  return  new D4JNDArray(manager,iNDArray.get(idx),device);
         return null;
     }
 
@@ -267,7 +267,7 @@ public class D4JNDArray implements NDArray, AutoCloseable {
     @Override
     public NDArray gte(NDArray other) {
 
-      return null;
+        return null;
     }
 
     @Override
@@ -487,6 +487,11 @@ public class D4JNDArray implements NDArray, AutoCloseable {
     }
 
     @Override
+    public NDArray sqrt() {
+        return null;
+    }
+
+    @Override
     public NDArray cbrt() {
 
         return null;
@@ -668,7 +673,6 @@ public class D4JNDArray implements NDArray, AutoCloseable {
 
     @Override
     public NDArray prod(int[] axes, boolean keepDims) {
-
         return null;
     }
 
@@ -755,7 +759,6 @@ public class D4JNDArray implements NDArray, AutoCloseable {
 
         return null;
     }
-
 
 
     @Override
@@ -872,7 +875,7 @@ public class D4JNDArray implements NDArray, AutoCloseable {
         return null;
     }
 
-    
+
     @Override
     public NDArray logSoftmax(int[] arg0, float arg1) {
 
@@ -886,7 +889,7 @@ public class D4JNDArray implements NDArray, AutoCloseable {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public NDArray argMax() {
 
@@ -987,14 +990,16 @@ public class D4JNDArray implements NDArray, AutoCloseable {
      * 'AtomicReference', 'AutoCloseable' & below inspired by ai.djl.pytorch.jni.NativeResource
      */
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
 
         logger.warn("Resource ({}) was not closed explicitly: {}",
-                    getUid(),
-                    getClass().getSimpleName());
+                getUid(),
+                getClass().getSimpleName());
 
         close();
         super.finalize();
@@ -1023,12 +1028,11 @@ public class D4JNDArray implements NDArray, AutoCloseable {
         return handle;
     }
 
-    
+
     @Override
     public String toString() {
         return iNDArray.toString();
     }
 
 
-    
 }

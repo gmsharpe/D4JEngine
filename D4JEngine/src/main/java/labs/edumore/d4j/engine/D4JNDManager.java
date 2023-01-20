@@ -8,6 +8,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.file.Path;
 
 import org.bytedeco.javacpp.Loader;
 import org.nd4j.linalg.factory.Nd4j;
@@ -152,6 +153,11 @@ public class D4JNDManager extends BaseNDManager {
         return null;
     }
 
+    @Override
+    public NDList load(Path path, Device device) {
+        return null;
+    }
+
     /** {@inheritDoc} */
     @Override
     public NDArray zeros(Shape shape, DataType dataType, Device device) {
@@ -174,6 +180,11 @@ public class D4JNDManager extends BaseNDManager {
                               device);
     }
 
+    @Override
+    public NDArray arange(float v, float v1, float v2, DataType dataType, Device device) {
+        return null;
+    }
+
     public NDArray
         arange(Number start, Number stop, Number step, DataType dataType, Device device) {
 
@@ -182,6 +193,21 @@ public class D4JNDManager extends BaseNDManager {
 
     public NDArray eye(int rows, int cols, int k, DataType dataType, Device device) {
 
+        return null;
+    }
+
+    @Override
+    public NDArray linspace(float v, float v1, int i, boolean b, Device device) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomUniform(float v, float v1, Shape shape, DataType dataType, Device device) {
+        return null;
+    }
+
+    @Override
+    public NDArray randomNormal(float v, float v1, Shape shape, DataType dataType, Device device) {
         return null;
     }
 
